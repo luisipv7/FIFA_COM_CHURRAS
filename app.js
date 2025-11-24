@@ -4,6 +4,7 @@ const defaultChampions = [
     name: 'Mateus',
     type: 'soldier',
     desc: 'Brigada Militar RS',
+    ano: '2023/11',
     emoji: '👮‍♂️',
   },
   {
@@ -11,6 +12,7 @@ const defaultChampions = [
     name: 'Fernando',
     type: 'dad',
     desc: 'Pai de 3 meninas (Haja coluna!)',
+    ano: '2025/03',
     emoji: '👨‍👧‍👧',
   },
   {
@@ -18,6 +20,7 @@ const defaultChampions = [
     name: 'Miguel',
     type: 'cyborg',
     desc: 'O Exterminador de Picanha',
+    ano: '2025/11',
     emoji: '🤖',
   },
 ];
@@ -78,6 +81,7 @@ document.body.addEventListener('htmx:beforeRequest', function (evt) {
                     <div class="info">
                         <h3>${c.edition}ª Edição: ${c.name}</h3>
                         <p>${c.desc}</p>
+                        <p>${c.ano}</p>
                     </div>
                 </div>
             `
@@ -98,6 +102,9 @@ document.body.addEventListener('htmx:beforeRequest', function (evt) {
                     
                     <label>Descrição (O Personagem):</label>
                     <input type="text" name="desc" required placeholder="Ex: O Rei do Gole">
+                    
+                    <label>Ano e Mês (Aproximado):</label>
+                    <input type="text" name="desc" required placeholder="Ex: 2025/05">
                     
                     <label>Tipo de Avatar:</label>
                     <select name="type">
