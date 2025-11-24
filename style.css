@@ -1,0 +1,248 @@
+:root {
+  --green: #009c3b;
+  --yellow: #ffdf00;
+  --blue: #002776;
+  --dark: #1a1a1a;
+  --bbq: #8b4513;
+}
+
+body {
+  font-family: 'Courier New', Courier, monospace;
+  background-color: var(--dark);
+  color: white;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.container {
+  width: 100%;
+  max-width: 600px;
+  text-align: center;
+  padding: 20px;
+}
+
+h1 {
+  text-shadow: 2px 2px 0px var(--green);
+  border-bottom: 4px solid var(--yellow);
+  padding-bottom: 10px;
+}
+
+.btn {
+  background: var(--green);
+  color: white;
+  border: 2px solid var(--yellow);
+  padding: 15px 30px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+  text-transform: uppercase;
+  margin: 10px;
+  box-shadow: 4px 4px 0px var(--blue);
+  transition: transform 0.1s;
+  display: inline-block;
+}
+
+.btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px var(--blue);
+}
+
+.btn-secondary {
+  background: var(--bbq);
+  border-color: #cd853f;
+}
+
+.scene {
+  width: 160px;
+  height: 320px;
+  margin: 40px auto 80px;
+  perspective: 1000px;
+}
+
+.trophy {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  animation: spin 8s infinite linear;
+}
+
+.cup-part {
+  position: absolute;
+  background: linear-gradient(45deg, #ffd700, #b8860b, #ffd700);
+  border: 1px solid #b8860b;
+}
+
+.base {
+  width: 100px;
+  height: 40px;
+  bottom: 0;
+  left: 50px;
+  transform: translateZ(20px);
+  background: #4a3b2a;
+}
+
+.base-top {
+  width: 100px;
+  height: 40px;
+  background: #b8860b;
+  position: absolute;
+  top: 230px;
+  left: 30px;
+  transform: rotateX(90deg);
+}
+
+.body-front,
+.body-back,
+.body-left,
+.body-right {
+  width: 100px;
+  height: 150px;
+  top: 50px;
+  left: 50px;
+  clip-path: polygon(0% 0%, 100% 0%, 80% 100%, 20% 100%);
+}
+
+.body-front {
+  transform: translateZ(50px);
+}
+.body-back {
+  transform: rotateY(180deg) translateZ(50px);
+}
+.body-left {
+  transform: rotateY(-90deg) translateZ(50px);
+}
+.body-right {
+  transform: rotateY(90deg) translateZ(50px);
+}
+
+/* Bola no topo */
+.ball {
+  width: 80px;
+  height: 80px;
+  background: radial-gradient(circle at 30% 30%, #fff, #ffd700 50%, #b8860b);
+  border-radius: 50%;
+  position: absolute;
+  top: 0;
+  left: 40px;
+  transform: translateZ(0);
+}
+
+.cup-bowl {
+  width: 100px;
+  height: 130px;
+  position: absolute;
+  top: 70px;
+  left: 30px;
+  border-radius: 5px 5px 60px 60px;
+}
+.bowl-front {
+  transform: translateZ(15px);
+}
+.bowl-back {
+  transform: rotateY(180deg) translateZ(15px);
+}
+
+.cup-stem {
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  top: 195px;
+  left: 60px;
+
+  transform: rotateY(45deg);
+}
+
+.cup-base {
+  width: 100px;
+  height: 60px;
+  position: absolute;
+  top: 230px;
+  left: 30px;
+  border-radius: 10px 10px 5px 5px;
+  border-top: 2px solid #ffd700;
+}
+.base-front {
+  transform: translateZ(20px);
+}
+.base-back {
+  transform: rotateY(180deg) translateZ(20px);
+}
+
+@keyframes spin {
+  from {
+    transform: rotateY(0deg);
+  }
+  to {
+    transform: rotateY(360deg);
+  }
+}
+
+.champion-card {
+  background: #333;
+  border: 1px solid var(--green);
+  margin: 15px 0;
+  padding: 15px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  text-align: left;
+}
+
+.avatar {
+  font-size: 3rem;
+  background: #000;
+  border-radius: 50%;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.avatar.soldier {
+  border: 3px solid var(--green);
+}
+.avatar.dad {
+  border: 3px solid pink;
+}
+.avatar.cyborg {
+  border: 3px solid cyan;
+  box-shadow: 0 0 10px cyan;
+}
+
+.info h3 {
+  margin: 0;
+  color: var(--yellow);
+}
+.info p {
+  margin: 5px 0 0;
+  font-size: 0.9rem;
+  color: #ccc;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  background: #333;
+  border: 1px solid var(--green);
+  color: white;
+}
+.gold-gradient {
+  background: linear-gradient(
+    to right,
+    #8b4513 0%,
+    #ffd700 25%,
+    #fffebb 50%,
+    #ffd700 75%,
+    #8b4513 100%
+  );
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
+}
