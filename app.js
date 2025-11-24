@@ -134,7 +134,6 @@ Davi"></textarea>
                     }
                 }
 
-                // MUDANÇA AQUI: Em vez de dropdown, pedimos o placar exato
                 let matchesHTML = currentLeague.matches
                     .map(
                         (m, index) => `
