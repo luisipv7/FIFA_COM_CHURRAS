@@ -123,21 +123,18 @@ Davi"></textarea>
                 .filter(n => n !== '');
 
             if (players.length < 3) {
-                responseHTML = `<h3 style="color:red">Precisa de no mínimo 3 jogadores!</h3><button class="btn" hx-get="/criar-copa" hx-target="#main-content">Voltar</button>`;
+                responseHTML = `<h3 style="color:red">Mínimo 3 jogadores!</h3><button class="btn" hx-get="/criar-copa" hx-target="#main-content">Voltar</button>`;
             } else {
                 currentLeague.players = players;
                 currentLeague.matches = [];
 
                 for (let i = 0; i < players.length; i++) {
                     for (let j = i + 1; j < players.length; j++) {
-                        currentLeague.matches.push({
-                            id: `${i}-${j}`,
-                            p1: players[i],
-                            p2: players[j],
-                        });
+                        currentLeague.matches.push({ id: `${i}-${j}`, p1: players[i], p2: players[j] });
                     }
                 }
 
+                // MUDANÇA AQUI: Em vez de dropdown, pedimos o placar exato
                 let matchesHTML = currentLeague.matches
                     .map(
                         (m, index) => `
@@ -145,14 +142,10 @@ Davi"></textarea>
                         <div class="match-players">
                             <span>${m.p1}</span> <span>X</span> <span>${m.p2}</span>
                         </div>
-                        <div class="match-inputs">
-                            <label>Quem venceu?</label>
-                            <select name="winner_${index}">
-                                <option value="draw">Empate</option>
-                                <option value="${m.p1}">${m.p1}</option>
-                                <option value="${m.p2}">${m.p2}</option>
-                            </select>
-                            <input type="number" name="goal_diff_${index}" placeholder="Saldo Gols" style="width:80px" value="0">
+                        <div class="match-inputs" style="justify-content: center;">
+                            <input type="number" name="score1_${index}" placeholder="0" style="width:50px; text-align:center;" min="0">
+                            <span style="font-size:1.5rem; margin:0 10px;">X</span>
+                            <input type="number" name="score2_${index}" placeholder="0" style="width:50px; text-align:center;" min="0">
                         </div>
                     </div>
                 `
@@ -161,7 +154,7 @@ Davi"></textarea>
 
                 responseHTML = `
                     <h2>⚔️ Fase de Grupos</h2>
-                    <p>Preencha os resultados e o saldo de gols de quem ganhou.</p>
+                    <p>Digite o placar dos jogos (deixe em branco se for 0x0 ou não jogou ainda):</p>
                     <form hx-post="/calcular-final" hx-target="#main-content">
                         ${matchesHTML}
                         <button class="btn">📊 Calcular Finalistas</button>
@@ -170,32 +163,44 @@ Davi"></textarea>
             }
         } else if (path === '/calcular-final') {
             const form = document.querySelector('form');
-
             let scoreboard = {};
-            currentLeague.players.forEach(p => (scoreboard[p] = { name: p, points: 0, balance: 0 }));
+            currentLeague.players.forEach(p => (scoreboard[p] = { name: p, points: 0, balance: 0, goals: 0 }));
 
             currentLeague.matches.forEach((m, index) => {
-                const winnerSelect = form.querySelector(`[name="winner_${index}"]`);
-                const diffInput = form.querySelector(`[name="goal_diff_${index}"]`);
+                const s1Input = form.querySelector(`[name="score1_${index}"]`);
+                const s2Input = form.querySelector(`[name="score2_${index}"]`);
 
-                const winner = winnerSelect ? winnerSelect.value : 'draw';
-                const diff = diffInput ? parseInt(diffInput.value) || 0 : 0;
+                // Se o campo estiver vazio, considera 0
+                const s1 = s1Input.value ? parseInt(s1Input.value) : 0;
+                const s2 = s2Input.value ? parseInt(s2Input.value) : 0;
 
-                if (winner === 'draw') {
+                // Atualiza gols pró (critério de desempate extra se quiser)
+                scoreboard[m.p1].goals += s1;
+                scoreboard[m.p2].goals += s2;
+
+                if (s1 > s2) {
+                    // P1 Venceu
+                    scoreboard[m.p1].points += 3;
+                    scoreboard[m.p1].balance += s1 - s2;
+                    scoreboard[m.p2].balance -= s1 - s2; // Perdedor perde saldo
+                } else if (s2 > s1) {
+                    // P2 Venceu
+                    scoreboard[m.p2].points += 3;
+                    scoreboard[m.p2].balance += s2 - s1;
+                    scoreboard[m.p1].balance -= s2 - s1;
+                } else {
+                    // Empate
                     scoreboard[m.p1].points += 1;
                     scoreboard[m.p2].points += 1;
-                } else {
-                    scoreboard[winner].points += 3;
-                    scoreboard[winner].balance += diff;
-
-                    const loser = winner === m.p1 ? m.p2 : m.p1;
-                    scoreboard[loser].balance -= diff;
+                    // Saldo não muda no empate
                 }
             });
 
+            // Ordenar: 1º Pontos, 2º Saldo, 3º Gols Pró
             const ranking = Object.values(scoreboard).sort((a, b) => {
                 if (b.points !== a.points) return b.points - a.points;
-                return b.balance - a.balance;
+                if (b.balance !== a.balance) return b.balance - a.balance;
+                return b.goals - a.goals;
             });
 
             const finalist1 = ranking[0];
@@ -205,23 +210,24 @@ Davi"></textarea>
                 <h2>🔥 A GRANDE FINAL 🔥</h2>
                 <div class="final-card">
                     <h3 style="color:var(--yellow); text-align:center;">${finalist1.name} VS ${finalist2.name}</h3>
-                    <p style="text-align:center;">Quem levará o troféu pra casa?</p>
                 </div>
 
                 <h3>Classificação Geral:</h3>
                 <ul style="text-align:left; background:#333; padding:10px;">
                     ${ranking
-                        .map((r, i) => `<li>${i + 1}º ${r.name} - ${r.points} pts (Saldo: ${r.balance})</li>`)
+                        .map(
+                            (r, i) =>
+                                `<li>${i + 1}º ${r.name} | Pts: ${r.points} | SG: ${r.balance} | GP: ${r.goals}</li>`
+                        )
                         .join('')}
                 </ul>
 
                 <form hx-post="/consagrar-campeao" hx-target="#main-content">
-                    <label>Quem foi o Campeão?</label>
+                    <label>Quem venceu a final?</label>
                     <select name="champion_name">
                         <option value="${finalist1.name}">${finalist1.name}</option>
                         <option value="${finalist2.name}">${finalist2.name}</option>
                     </select>
-                    <input type="hidden" name="champion_desc" value="Venceu a Copa FIFA Churras">
                     <button class="btn">🏆 Entregar Taça</button>
                 </form>
             `;
